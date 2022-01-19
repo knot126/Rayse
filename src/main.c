@@ -8,12 +8,14 @@
 #include "util/log.h"
 #include "util/bitmap.h"
 #include "util/rand.h"
+#include "util/time.h"
 
 #include "common.h"
 
 int main(int argc, const char *argv[]) {
 	DgLog(DG_LOG_INFO, "Hello, world!\n");
 	
+	DgInitTime();
 	DgInitPaths(DG_PATH_FAIL_FATAL);
 	
 	DgBitmap bmp;
@@ -23,8 +25,16 @@ int main(int argc, const char *argv[]) {
 	}
 	
 	DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.0f, 0.0f, 1.0f});
-	DgVec2 points[3] = { {0.3f, 0.6f}, {0.6f, 0.7f}, {0.7f, 0.3f} };
-	DgBitmapDrawConvexPolygon(&bmp, 3, points, &(DgVec4) {0.1, 0.3f, 0.7f, 1.0f});
+	
+	for (size_t i = 0; i < 25; i++) {
+		DgVec2 points[] = {
+			{DgRandFloat(), DgRandFloat()},
+			{DgRandFloat(), DgRandFloat()},
+			{DgRandFloat(), DgRandFloat()}
+		};
+		DgBitmapDrawConvexPolygon(&bmp, 3, points, &(DgVec4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), DgRandFloat()});
+	}
+	
 	DgBitmapWritePPM(&bmp, "assets://image.ppm");
 	
 	DgBitmapFree(&bmp);
