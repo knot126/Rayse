@@ -1,1 +1,1 @@
-clang -o ./rayse.bin -I./src -Wall -DDG_NO_LUA src/main.c $(ls src/util/*.c) -lm -lpthread
+gcc -o ./rayse.bin -g -I./src -Wall -DDG_NO_LUA src/main.c $(ls src/util/*.c) -lm -lpthread

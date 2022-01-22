@@ -24,7 +24,9 @@ int main(int argc, const char *argv[]) {
 		return 1;
 	}
 	
-	DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.0f, 0.0f, 1.0f});
+	DgBitmapFill(&bmp, (DgVec4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), 1.0f});
+	
+	DgBitmapSetFlags(&bmp, DG_BITMAP_DRAWING_ALPHA);
 	
 	for (size_t i = 0; i < 25; i++) {
 		DgVec2 points[] = {
@@ -32,7 +34,7 @@ int main(int argc, const char *argv[]) {
 			{DgRandFloat(), DgRandFloat()},
 			{DgRandFloat(), DgRandFloat()}
 		};
-		DgBitmapDrawConvexPolygon(&bmp, 3, points, &(DgVec4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), DgRandFloat()});
+		DgBitmapDrawConvexPolygon(&bmp, 3, points, &(DgVec4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), 0.5f + 0.5f * DgRandFloat()});
 	}
 	
 	DgBitmapWritePPM(&bmp, "assets://image.ppm");
