@@ -38,7 +38,7 @@ int main(int argc, const char *argv[]) {
 	}
 	
 	DgBitmapWritePPM(&bmp, "assets://image.ppm");
-	
+	DgBitmapAntiAliasX(&bmp);
 	DgBitmapFree(&bmp);
 	
 	return 0;
