@@ -1,1 +1,1 @@
-gcc -o ./hello.bin -I./src -Wall src/main.c
+gdc -o ./hello.bin -I./src -Wall $(ls src/*.d)

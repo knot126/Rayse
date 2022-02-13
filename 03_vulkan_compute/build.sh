@@ -1,1 +1,1 @@
-gcc -o ./hello.bin -I./src -Wall src/main.c
+gcc -o ./hello.bin -I./src -Wall src/main.c src/graphics.c
