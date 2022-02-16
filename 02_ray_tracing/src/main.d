@@ -3,6 +3,7 @@ import std.stdio;
 import maths;
 import shape;
 import material;
+import bitmap;
 
 void KI_Vector_Test() {
 	KI_Vec2 v = KI_Vec2(1.0, 2.0);
@@ -38,5 +39,7 @@ void KI_Shape_Test() {
 }
 
 void main() {
-	KI_Vector_Test();
+	KI_Bitmap bmp = KI_Bitmap(KI_Vec2I(960, 720));
+	bmp.Clear(KI_Colour(0.0, 0.0, 0.0, 1.0));
+	bmp.Write_PPM("./image.ppm");
 }

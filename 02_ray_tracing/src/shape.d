@@ -9,7 +9,7 @@
 import maths;
 import material;
 
-struct KI_Sphere {
+class KI_Sphere {
 	/**
 	 * Sphere
 	 */
@@ -18,7 +18,7 @@ struct KI_Sphere {
 	Real radius;
 }
 
-struct KI_Box {
+class KI_Box {
 	/**
 	 * Box
 	 */
@@ -27,7 +27,7 @@ struct KI_Box {
 	KI_Vec3 size;
 }
 
-struct KI_Triangle {
+class KI_Triangle {
 	/**
 	 * Triangle
 	 */

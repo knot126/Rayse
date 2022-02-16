@@ -300,6 +300,223 @@ struct KI_Mat4 {
 }
 
 /**
+ * 2D vector class
+ */
+struct KI_Vec2I {
+	union {
+		struct {
+			Integer x, y;
+		}
+		
+		struct {
+			Integer u, v;
+		}
+		
+		struct {
+			Integer[2] data;
+		}
+	}
+	
+	alias data this;
+	
+	this(Integer x, Integer y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	KI_Vec2I opUrnary(string op)() if (op == "-") {
+		/**
+		 * Opposite vector
+		 */
+		
+		return KI_Vec2I(-this.x, -this.y);
+	}
+	
+	KI_Vec2I opBinary(string op)(KI_Vec2I other) if (op == "+") {
+		/**
+		 * Vector addition
+		 */
+		
+		return KI_Vec2I(this.x + other.x, this.y + other.y);
+	}
+	
+	KI_Vec2I opBinary(string op)(KI_Vec2I other) if (op == "-") {
+		/**
+		 * Vector subtraction
+		 */
+		
+		return KI_Vec2I(this.x - other.x, this.y - other.y);
+	}
+	
+	KI_Vec2I opBinary(string op)(Real other) if (op == "*") {
+		/**
+		 * Vector scalar multiplication
+		 */
+		
+		return KI_Vec2I(this.x * other, this.y * other);
+	}
+	
+	KI_Vec2I opBinary(string op)(Real other) if (op == "/") {
+		/**
+		 * Vector scalar division
+		 */
+		
+		Real m = 1.0 / other;
+		return KI_Vec2I(this.x * m, this.y * m);
+	}
+	
+	Real opBinary(string op)(KI_Vec2I other) if (op == "*") {
+		/**
+		 * Vector dot product
+		 */
+		
+		return (this.x * other.x) + (this.y * other.y);
+	}
+	
+	KI_Vec2I Cross() {
+		/**
+		 * Return a vector perpindicular to this one (basically the 2D cross
+		 * product)
+		 */
+		
+		return KI_Vec2I(this.y, -this.x);
+	}
+	
+	Real Length() {
+		/**
+		 * Length of a vector
+		 */
+		
+		return sqrt(cast(float)(this.x * this.x + this.y * this.y));
+	}
+	
+	void Print() {
+		/**
+		 * Print a vector
+		 */
+		
+		write("[ ", this.x, " ", this.y, " ]");
+	}
+}
+
+struct KI_Vec4B {
+	/**
+	 * Single byte vector 4 class (mainly for colour storage)
+	 */
+	
+	union {
+		struct {
+			char x, y, z, w;
+		}
+		
+		struct {
+			char r, g, b, a;
+		}
+		
+		struct {
+			char[4] data;
+		}
+	}
+	
+	alias data this;
+	
+	this(KI_Colour c) {
+		this.r = cast(char)(c.r * 255.0);
+		this.g = cast(char)(c.g * 255.0);
+		this.b = cast(char)(c.b * 255.0);
+		this.a = cast(char)(c.a * 255.0);
+	}
+	
+	this(char x, char y, char z, char w) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+	}
+	
+	KI_Vec4B opBinary(string op)(KI_Vec4B other) if (op == "+") {
+		/**
+		 * Vector addition
+		 */
+		
+		return KI_Vec4B(this.x + other.x, this.y + other.y, this.z + other.z, this.w + other.w);
+	}
+	
+	KI_Vec4B opBinary(string op)(KI_Vec4B other) if (op == "-") {
+		/**
+		 * Vector subtraction
+		 */
+		
+		return KI_Vec4B(this.x - other.x, this.y - other.y, this.z - other.z, this.w - other.w);
+	}
+	
+	KI_Vec4B opBinary(string op)(Real other) if (op == "*") {
+		/**
+		 * Vector scalar multiplication
+		 */
+		
+		return KI_Vec4B(this.x * other, this.y * other, this.z * other, this.w * other);
+	}
+	
+	KI_Vec4B opBinary(string op)(Real other) if (op == "/") {
+		/**
+		 * Vector scalar division
+		 */
+		
+		Real m = 1.0 / other;
+		return KI_Vec4B(this.x * m, this.y * m, this.z * m, this.w * m);
+	}
+	
+	Real opBinary(string op)(KI_Vec4B other) if (op == "*") {
+		/**
+		 * Vector dot product
+		 */
+		
+		return (this.x * other.x) + (this.y * other.y) + (this.z * other.z) + (this.w * other.w);
+	}
+	
+	Real Length() {
+		/**
+		 * Length of a vector
+		 */
+		
+		return sqrt(cast(float)(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w));
+	}
+	
+	void Print() {
+		/**
+		 * Print a vector
+		 */
+		
+		write("[ ", this.x, " ", this.y, " ]");
+	}
+}
+
+KI_Vec2I KI_Get_Array2D_From_Index(KI_Vec2I size, size_t index) {
+	/**
+	 * Get a 2D array index given the size and index of an array.
+	 * 
+	 * @param size Size of the array
+	 * @param index Index to convert
+	 * @return 2D array indicies
+	 */
+	
+	return KI_Vec2I(cast(Integer) index % size.x, cast(Integer) index / size.x);
+}
+
+size_t KI_Get_Index_From_Array2D(KI_Vec2I size, KI_Vec2I array) {
+	/**
+	 * Get a plain array index given the size and 2D array index.
+	 * 
+	 * @param size Size of the array
+	 * @param array Array coordinates to convert
+	 * @return Index of the array
+	 */
+	
+	return (size.x * array.y) + array.x;
+}
+
+/**
  * Interpolation
  */
 
