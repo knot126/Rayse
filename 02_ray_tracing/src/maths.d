@@ -69,6 +69,14 @@ struct KI_Vec2 {
 		return KI_Vec2(this.x * other, this.y * other);
 	}
 	
+	KI_Vec2 opBinaryRight(string op)(Real other) if (op == "*") {
+		/**
+		 * Vector scalar multiplication
+		 */
+		
+		return KI_Vec2(this.x * other, this.y * other);
+	}
+	
 	KI_Vec2 opBinary(string op)(Real other) if (op == "/") {
 		/**
 		 * Vector scalar division
@@ -95,12 +103,21 @@ struct KI_Vec2 {
 		return KI_Vec2(this.y, -this.x);
 	}
 	
+	Real Length_Squared() {
+		/**
+		 * Return the squared length of the vector (faster than the regular
+		 * length since it avoids square root).
+		 */
+		
+		return this.x * this.x + this.y * this.y;
+	}
+	
 	Real Length() {
 		/**
 		 * Length of a vector
 		 */
 		
-		return sqrt(this.x * this.x + this.y * this.y);
+		return sqrt(this.Length_Squared());
 	}
 	
 	KI_Vec2 Normalised() {
@@ -178,6 +195,14 @@ struct KI_Vec3 {
 		return KI_Vec3(this.x * other, this.y * other, this.z * other);
 	}
 	
+	KI_Vec3 opBinaryRight(string op)(Real other) if (op == "*") {
+		/**
+		 * Vector scalar multiplication
+		 */
+		
+		return KI_Vec3(this.x * other, this.y * other, this.z * other);
+	}
+	
 	KI_Vec3 opBinary(string op)(Real other) if (op == "/") {
 		/**
 		 * Vector scalar division
@@ -207,12 +232,21 @@ struct KI_Vec3 {
 		);
 	}
 	
+	Real Length_Squared() {
+		/**
+		 * Return the squared length of the vector (faster than the regular
+		 * length since it avoids square root).
+		 */
+		
+		return this.x * this.x + this.y * this.y + this.z * this.z;
+	}
+	
 	Real Length() {
 		/**
 		 * Length of a vector
 		 */
 		
-		return sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+		return sqrt(this.Length_Squared());
 	}
 	
 	KI_Vec3 Normalised() {
@@ -492,6 +526,31 @@ struct KI_Vec4B {
 	}
 }
 
+struct KI_Ray3 {
+	/**
+	 * 3D geometric ray
+	 */
+	
+	KI_Vec3 origin, direction;
+	
+	this(KI_Vec3 origin, KI_Vec3 direction) {
+		/**
+		 * Create a ray given the origin and direction.
+		 */
+		
+		this.origin = origin;
+		this.direction = direction;
+	}
+	
+	KI_Vec3 Evaluate(Real t) {
+		/**
+		 * Evaluate the coordinates of a point at O+(t*D).
+		 */
+		
+		return this.origin + t * this.direction;
+	}
+}
+
 KI_Vec2I KI_Get_Array2D_From_Index(KI_Vec2I size, size_t index) {
 	/**
 	 * Get a 2D array index given the size and index of an array.
@@ -514,6 +573,38 @@ size_t KI_Get_Index_From_Array2D(KI_Vec2I size, KI_Vec2I array) {
 	 */
 	
 	return (size.x * array.y) + array.x;
+}
+
+/**
+ * Polynomials
+ */
+
+Real KI_Poly2_Det(Real a, Real b, Real c) {
+	/**
+	 * Calculate the determinate
+	 */
+	
+	return (b * b) - 4.0 * a * c;
+}
+
+Real[] KI_Poly2_Roots(Real a, Real b, Real c) {
+	/**
+	 * Return a list of the roots of the 2nd degree polynomial with the given
+	 * coefficents. Uses quadratic formula.
+	 */
+	
+	Real[] roots;
+	Real det = KI_Poly2_Det(a, b, c);
+	
+	if (det < 0.0) {
+		return roots;
+	}
+	
+	for (size_t i = 0; i < (det == 0.0) ? (1) : (2); i++) {
+		roots[roots.length++] = (-b + (i) ? (-sqrt(det)) : (sqrt(det))) / (2.0 * a);
+	}
+	
+	return roots;
 }
 
 /**

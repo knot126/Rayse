@@ -3,7 +3,7 @@
  * See LICENCE for details.
  * =============================================================================
  * 
- * Bitmap image
+ * Descretised image bitmap for display to a monitor
  */
 
 import std.conv;

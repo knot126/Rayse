@@ -3,7 +3,7 @@
  * See LICENCE for details.
  * =============================================================================
  * 
- * Most mathematical functions
+ * File and folder utilites
  */
 
 import std.stdio;
