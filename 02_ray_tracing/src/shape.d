@@ -41,12 +41,14 @@ class KI_Sphere : KI_Subshape {
 		
 		Real a = ray.direction.Length_Squared();
 		Real b = ray.direction * ray.origin;
-		Real c = ray.origin.Length_Squared();
+		Real c = (ray.origin - this.position).Length_Squared();
 		
 		Real[] roots = KI_Poly2_Roots(a, b, c);
 		
 		foreach (root; roots) {
-			points[points.length++] = ray.Evaluate(root);
+			if (root >= 0.0) {
+				points[points.length++] = ray.Evaluate(root);
+			}
 		}
 		
 		return points;
@@ -119,6 +121,10 @@ struct KI_Shape {
 	}
 	
 	bool Check_Point(KI_Vec3 point) {
+		/**
+		 * Check the shape against a ray.
+		 */
+		
 		foreach (cmd; commands) {
 			if (cmd.shape.Check_Point(point)) {
 				return true;
@@ -126,6 +132,20 @@ struct KI_Shape {
 		}
 		
 		return false;
+	}
+	
+	KI_Vec3[] Check_Ray(KI_Ray3 ray) {
+		/**
+		 * Check the shape against a ray.
+		 */
+		
+		KI_Vec3[] points;
+		
+		foreach (cmd; commands) {
+			points ~= cmd.shape.Check_Ray(ray);
+		}
+		
+		return points;
 	}
 }
 

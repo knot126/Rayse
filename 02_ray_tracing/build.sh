@@ -1,1 +1,1 @@
-gdc -o ./hello.bin -I./src -Wall $(ls src/*.d)
+gdc -o ./raytrace.bin -I./src -Wall $(ls src/*.d)
