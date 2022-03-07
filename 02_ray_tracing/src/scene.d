@@ -12,7 +12,7 @@ import shape;
 class KI_Scene {
 	KI_Shape[] shapes;
 	
-	KI_Shape[] Check_Ray() {
+	KI_Shape[] Check_Ray(KI_Ray3 ray) {
 		/**
 		 * Check a shape's collision against the scene.
 		 */
