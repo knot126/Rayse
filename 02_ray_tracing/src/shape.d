@@ -6,12 +6,23 @@
  * 3D and 2D Shape utilities and representations
  */
 
+import std.stdio;
 import maths;
 import material;
 
+enum KI_Shape_Type {
+	/**
+	 * The type of a shape
+	 */
+	
+	None = 0,
+	Sphere = 1,
+}
+
 interface KI_Subshape {
 	bool Check_Point(KI_Vec3 point);
-	KI_Vec3[] Check_Ray(KI_Ray3 ray);
+	Real[] Check_Ray(KI_Ray3 ray);
+	KI_Shape_Type Get_Type();
 }
 
 class KI_Sphere : KI_Subshape {
@@ -22,6 +33,11 @@ class KI_Sphere : KI_Subshape {
 	KI_Vec3 position;
 	Real radius;
 	
+	this(KI_Vec3 position, Real radius) {
+		this.position = position;
+		this.radius = radius;
+	}
+	
 	bool Check_Point(KI_Vec3 point) {
 		/**
 		 * Check if a point is within the closed ball that has the same radius
@@ -31,37 +47,41 @@ class KI_Sphere : KI_Subshape {
 		return (point - this.position).Length() <= this.radius;
 	}
 	
-	KI_Vec3[] Check_Ray(KI_Ray3 ray) {
+	Real[] Check_Ray(KI_Ray3 ray) {
 		/**
-		 * Preform a raycast on the shape and return a list of points on the
-		 * sphere.
+		 * Preform a raycast on the shape and return a list of t-values of where
+		 * the ray intersects.
 		 */
 		
-		KI_Vec3[] points;
+		Real[] points;
 		
+// 		Real a = ray.direction.Length_Squared();
+// 		Real b = ray.direction * ray.origin;
+// 		Real c = (ray.origin - this.position).Length_Squared();
 		Real a = ray.direction.Length_Squared();
-		Real b = ray.direction * ray.origin;
-		Real c = (ray.origin - this.position).Length_Squared();
+		Real b = 2.0 * (ray.direction * (ray.origin - this.position));
+		Real c = (ray.origin - this.position).Length_Squared() - (this.radius * this.radius);
 		
 		Real[] roots = KI_Poly2_Roots(a, b, c);
 		
 		foreach (root; roots) {
+			writeln("Root ", root);
+			
 			if (root >= 0.0) {
-				points[points.length++] = ray.Evaluate(root);
+				points[points.length++] = root;
 			}
 		}
 		
 		return points;
 	}
-}
-
-enum KI_Shape_Command_Type {
-	/**
-	 * The command for a shape object
-	 */
 	
-	None = 0,
-	Sphere = 1,
+	KI_Shape_Type Get_Type() {
+		/**
+		 * Get the type of the shape
+		 */
+		
+		return KI_Shape_Type.Sphere;
+	}
 }
 
 struct KI_Shape_Command {
@@ -69,25 +89,10 @@ struct KI_Shape_Command {
 	 * A shape command (CSG operation)
 	 */
 	
-	KI_Shape_Command_Type type;
 	KI_Subshape shape;
 	
-	this(KI_Shape_Command_Type type, KI_Subshape shape) {
-		this.type = type;
+	this(KI_Subshape shape) {
 		this.shape = shape;
-	}
-}
-
-KI_Shape_Command_Type KI_Shape_Type_To_Enum(KI_Subshape shape) {
-	/**
-	 * Get a shape type enum given the type string
-	 */
-	
-	switch (typeid(shape).toString()) {
-		case "KI_Sphere":
-			return KI_Shape_Command_Type.Sphere;
-		default:
-			return KI_Shape_Command_Type.None;
 	}
 }
 
@@ -111,13 +116,7 @@ struct KI_Shape {
 		 * Push a shape to the shape command array.
 		 */
 		
-		KI_Shape_Command_Type type = KI_Shape_Type_To_Enum(shape);
-		
-		if (type == KI_Shape_Command_Type.None) {
-			return;
-		}
-		
-		this.commands[this.commands.length++] = KI_Shape_Command(type, shape);
+		this.commands ~= KI_Shape_Command(shape);
 	}
 	
 	bool Check_Point(KI_Vec3 point) {
@@ -134,16 +133,18 @@ struct KI_Shape {
 		return false;
 	}
 	
-	KI_Vec3[] Check_Ray(KI_Ray3 ray) {
+	Real[] Check_Ray(KI_Ray3 ray) {
 		/**
 		 * Check the shape against a ray.
 		 */
 		
-		KI_Vec3[] points;
+		Real[] points;
 		
 		foreach (cmd; commands) {
 			points ~= cmd.shape.Check_Ray(ray);
 		}
+		
+		//writeln(points);
 		
 		return points;
 	}

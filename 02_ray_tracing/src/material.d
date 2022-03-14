@@ -15,8 +15,8 @@ struct KI_Material {
 	
 	KI_Colour colour;       // each component in [0, 1]
 	
-	this(KI_Colour *colour) {
-		this.colour = *colour;
+	this(ref KI_Colour colour) {
+		this.colour = colour;
 	}
 	
 	KI_Colour *Get_Colour() {
