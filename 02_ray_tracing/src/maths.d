@@ -600,8 +600,15 @@ Real[] KI_Poly2_Roots(Real a, Real b, Real c) {
 		return roots;
 	}
 	
-	for (size_t i = 0; i < (det == 0.0) ? (1) : (2); i++) {
-		roots ~= (-b + (i) ? (-sqrt(det)) : (sqrt(det))) / (2.0 * a);
+// 	for (size_t i = 0; i < ((det == 0.0) ? (1) : (2)); i++) {
+// 		roots ~= (-b + (i) ? (-sqrt(det)) : (sqrt(det))) / (2.0 * a);
+// 	}
+	else if (det == 0.0) {
+		roots ~= (-b) / (2.0 * a);
+	}
+	else {
+		roots ~= (-b - sqrt(det)) / (2.0 * a);
+		roots ~= (-b + sqrt(det)) / (2.0 * a);
 	}
 	
 	return roots;

@@ -78,9 +78,9 @@ struct KI_Bitmap {
 		
 		for (size_t i = 0; i < max; i++) {
 			KI_Vec4B c = KI_Vec4B(this.data[i]);
-			file.writeln(c.r);
-			file.writeln(c.g);
-			file.writeln(c.b);
+			file.write(c.r);
+			file.write(c.g);
+			file.write(c.b);
 		}
 		
 		file.close();

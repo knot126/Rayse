@@ -56,11 +56,9 @@ KI_Bitmap KI_Raytrace_Scene(KI_Scene scene, KI_Raytrace_Config config) {
 			// Send a raycast to the scene
 			KI_Ray_Hit hit = scene.Check_Ray_Closest(ray);
 			
-			//writeln("Raycast direction: ", i, " ", j, "  ", dir.x, " ", dir.y, " ", dir.z);
-			
 			// Draw pixel for closest object hit
 			if (hit.shape != null) {
-				writeln("Hit!");
+// 				writeln("Hit!", hit.shape.material);
 				bitmap.Set_Pixel(KI_Vec2I(cast(Integer) i, cast(Integer) j), hit.shape.material.colour);
 			}
 		}

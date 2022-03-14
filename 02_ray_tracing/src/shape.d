@@ -68,7 +68,7 @@ class KI_Sphere : KI_Subshape {
 			writeln("Root ", root);
 			
 			if (root >= 0.0) {
-				points[points.length++] = root;
+				points ~= root;
 			}
 		}
 		

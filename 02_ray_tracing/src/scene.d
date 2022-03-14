@@ -45,7 +45,7 @@ struct KI_Scene {
 			Real[] points = shape.Check_Ray(ray);
 			
 			foreach (t; points) {
-				hits[hits.length++] = KI_Ray_Hit(&shape, t);
+				hits ~= KI_Ray_Hit(&shape, t);
 			}
 		}
 		
