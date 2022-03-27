@@ -21,7 +21,9 @@ enum KI_Shape_Type {
 
 interface KI_Subshape {
 	bool Check_Point(KI_Vec3 point);
+	Real Check_Point_Distance(KI_Vec3 point);
 	Real[] Check_Ray(KI_Ray3 ray);
+	KI_Vec3 Get_Normal(KI_Vec3 point);
 	KI_Shape_Type Get_Type();
 }
 
@@ -47,6 +49,14 @@ class KI_Sphere : KI_Subshape {
 		return (point - this.position).Length() <= this.radius;
 	}
 	
+	Real Check_Point_Distance(KI_Vec3 point) {
+		/**
+		 * Get the distance from a point to the surface.
+		 */
+		
+		return (point - this.position).Length() - this.radius;
+	}
+	
 	Real[] Check_Ray(KI_Ray3 ray) {
 		/**
 		 * Preform a raycast on the shape and return a list of t-values of where
@@ -55,9 +65,6 @@ class KI_Sphere : KI_Subshape {
 		
 		Real[] points;
 		
-// 		Real a = ray.direction.Length_Squared();
-// 		Real b = ray.direction * ray.origin;
-// 		Real c = (ray.origin - this.position).Length_Squared();
 		Real a = ray.direction.Length_Squared();
 		Real b = 2.0 * (ray.direction * (ray.origin - this.position));
 		Real c = (ray.origin - this.position).Length_Squared() - (this.radius * this.radius);
@@ -65,7 +72,7 @@ class KI_Sphere : KI_Subshape {
 		Real[] roots = KI_Poly2_Roots(a, b, c);
 		
 		foreach (root; roots) {
-			writeln("Root ", root);
+// 			writeln("Root ", root);
 			
 			if (root >= 0.0) {
 				points ~= root;
@@ -73,6 +80,14 @@ class KI_Sphere : KI_Subshape {
 		}
 		
 		return points;
+	}
+	
+	KI_Vec3 Get_Normal(KI_Vec3 point) {
+		/**
+		 * Get the normal of the surface at a point on the surface
+		 */
+		
+		return (point - this.position) / this.radius;
 	}
 	
 	KI_Shape_Type Get_Type() {
@@ -86,7 +101,7 @@ class KI_Sphere : KI_Subshape {
 
 struct KI_Shape_Command {
 	/**
-	 * A shape command (CSG operation)
+	 * A shape
 	 */
 	
 	KI_Subshape shape;
@@ -103,6 +118,7 @@ struct KI_Shape {
 	 * mesh, or any combination of these.
 	 */
 	
+	KI_Vec3 position;
 	KI_Shape_Command[] commands;
 	KI_Material *material;
 	
@@ -124,7 +140,7 @@ struct KI_Shape {
 		 * Check the shape against a ray.
 		 */
 		
-		foreach (cmd; commands) {
+		foreach (cmd; this.commands) {
 			if (cmd.shape.Check_Point(point)) {
 				return true;
 			}
@@ -140,13 +156,25 @@ struct KI_Shape {
 		
 		Real[] points;
 		
-		foreach (cmd; commands) {
+		foreach (cmd; this.commands) {
 			points ~= cmd.shape.Check_Ray(ray);
 		}
 		
-		//writeln(points);
-		
 		return points;
+	}
+	
+	KI_Vec3 Get_Normal(KI_Vec3 point) {
+		/**
+		 * Retrive the normal for a shape at a given point.
+		 */
+		
+		foreach (cmd; this.commands) {
+			if (cmd.shape.Check_Point_Distance(point) <= 0.001) {
+				return cmd.shape.Get_Normal(point);
+			}
+		}
+		
+		return KI_Vec3(0.0, 0.0, 0.0);
 	}
 }
 

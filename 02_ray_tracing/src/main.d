@@ -14,6 +14,7 @@ import material;
 import bitmap;
 import raytrace;
 import scene;
+import light;
 
 void main() {
 	KI_Scene scene;
@@ -21,16 +22,19 @@ void main() {
 	KI_Shape shape = KI_Shape();
 	KI_Material material;
 	KI_Raytrace_Config config;
+	KI_Light light = KI_Light(KI_Vec3(2.0, -1.0, -1.0), KI_Colour(1.0, 1.0, 1.0, 1.0));
 	
-	material.colour = KI_Colour(0.0, 1.0, 0.0, 1.0);
+	material.colour = KI_Colour(1.0, 0.5, 0.5, 1.0);
 	shape.material = &material;
 	shape.Push(sphere);
 	scene.Add_Shape(shape);
+	scene.Add_Light(light);
 	
 	config.background = KI_Colour(0.0, 0.0, 0.0, 1.0);
 	config.canvas = KI_Vec2(1.0, 1.0);
 	config.dist = 1.0;
 	config.res = KI_Vec2I(800, 800);
+	config.ambient = KI_Colour(0.1, 0.1, 0.1, 1.0);
 	
 	KI_Bitmap bitmap = KI_Raytrace_Scene(scene, config);
 	

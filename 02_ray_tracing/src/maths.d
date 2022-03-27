@@ -292,6 +292,42 @@ struct KI_Vec4 {
 		this.z = z;
 		this.w = w;
 	}
+	
+	KI_Vec4 opBinary(string op)(KI_Vec4 other) if (op == "+") {
+		/**
+		 * Vector addition
+		 */
+		
+		return KI_Vec4(this.x + other.x, this.y + other.y, this.z + other.z, this.w + other.w);
+	}
+	
+	KI_Vec4 opBinary(string op)(Real other) if (op == "*") {
+		/**
+		 * Vector and scalar multiplication
+		 */
+		
+		return KI_Vec4(other * this.x, other * this.y, other * this.z, other * this.w);
+	}
+	
+	KI_Vec4 opBinaryRight(string op)(Real other) if (op == "*") {
+		/**
+		 * Vector and scalar multiplication
+		 */
+		
+		return KI_Vec4(other * this.x, other * this.y, other * this.z, other * this.w);
+	}
+	
+	KI_Vec4 Multiply_Each(KI_Vec4 other) {
+		/**
+		 * Multiply each compontent with one another.
+		 */
+		
+		return KI_Vec4(this.r * other.r, this.g * other.g, this.b * other.b, this.a * other.a);
+	}
+	
+	KI_Vec4 Clamp(Real m, Real M) {
+		return KI_Vec4(KI_Max!Real(KI_Min!Real(this.x, M), m), KI_Max!Real(KI_Min!Real(this.y, M), m), KI_Max!Real(KI_Min!Real(this.z, M), m), KI_Max!Real(KI_Min!Real(this.w, M), m));
+	}
 }
 
 alias KI_Colour = KI_Vec4;
@@ -599,10 +635,6 @@ Real[] KI_Poly2_Roots(Real a, Real b, Real c) {
 	if (det < 0.0) {
 		return roots;
 	}
-	
-// 	for (size_t i = 0; i < ((det == 0.0) ? (1) : (2)); i++) {
-// 		roots ~= (-b + (i) ? (-sqrt(det)) : (sqrt(det))) / (2.0 * a);
-// 	}
 	else if (det == 0.0) {
 		roots ~= (-b) / (2.0 * a);
 	}
@@ -624,4 +656,16 @@ Type KI_Lerp(Type)(Real t, Type a, Type b) {
 	 */
 	
 	return ((1.0 - t) * a) + (t * b);
+}
+
+/**
+ * Min/Max
+ */
+
+Type KI_Max(Type)(Type a, Type b) {
+	return (a <= b) ? b : a;
+}
+
+Type KI_Min(Type)(Type a, Type b) {
+	return (a >= b) ? b : a;
 }

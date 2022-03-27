@@ -3,7 +3,7 @@
  * See LICENCE for details.
  * =============================================================================
  * 
- * 3D and 2D Shape utilities and representations
+ * Core ray tracing implementation
  */
 
 import std.stdio;
@@ -20,6 +20,7 @@ struct KI_Raytrace_Config {
 	KI_Vec2 canvas;
 	Real dist;
 	KI_Vec2I res;
+	KI_Colour ambient;
 }
 
 KI_Bitmap KI_Raytrace_Scene(KI_Scene scene, KI_Raytrace_Config config) {
@@ -58,8 +59,21 @@ KI_Bitmap KI_Raytrace_Scene(KI_Scene scene, KI_Raytrace_Config config) {
 			
 			// Draw pixel for closest object hit
 			if (hit.shape != null) {
-// 				writeln("Hit!", hit.shape.material);
-				bitmap.Set_Pixel(KI_Vec2I(cast(Integer) i, cast(Integer) j), hit.shape.material.colour);
+				KI_Colour fin = KI_Colour(0.0, 0.0, 0.0, 0.0);
+				
+				// Accumulate lights
+				foreach (light; scene.lights) {
+					KI_Vec3 position = ray.Evaluate(hit.t);
+					KI_Vec3 to_light = (light.position - position).Normalised();
+					to_light.Print();
+					KI_Shape s = *(hit.shape);
+					Real angle = KI_Max!Real(to_light * s.Get_Normal(position), 0.0);
+					fin = fin + (angle * hit.shape.material.colour);
+				}
+				
+				fin = fin + config.ambient.Multiply_Each(hit.shape.material.colour);
+				
+				bitmap.Set_Pixel(KI_Vec2I(cast(Integer) i, cast(Integer) j), fin.Clamp(0.0, 1.0));
 			}
 		}
 	}
