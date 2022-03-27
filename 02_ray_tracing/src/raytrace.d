@@ -51,7 +51,7 @@ KI_Bitmap KI_Raytrace_Scene(KI_Scene scene, KI_Raytrace_Config config) {
 			// Create direction vector
 			KI_Vec3 dir = KI_Vec3(p, q, config.dist);
 			
-			// Create ray
+			// Create ray (does not need to be normalised)
 			KI_Ray3 ray = KI_Ray3(KI_Vec3(0.0, 0.0, 0.0), dir);
 			
 			// Send a raycast to the scene
@@ -60,20 +60,28 @@ KI_Bitmap KI_Raytrace_Scene(KI_Scene scene, KI_Raytrace_Config config) {
 			// Draw pixel for closest object hit
 			if (hit.shape != null) {
 				KI_Colour fin = KI_Colour(0.0, 0.0, 0.0, 0.0);
+				KI_Vec3 from = ray.Evaluate(hit.t);
 				
 				// Accumulate lights
 				foreach (light; scene.lights) {
-					KI_Vec3 position = ray.Evaluate(hit.t);
-					KI_Vec3 to_light = (light.position - position).Normalised();
-					to_light.Print();
+					// Vector pointing in the direction of the light from this point on the surface
+					KI_Vec3 to_light = (light.position - from).Normalised();
+					
+					// The shape
 					KI_Shape s = *(hit.shape);
-					Real angle = KI_Max!Real(to_light * s.Get_Normal(position), 0.0);
+					
+					// Get the facing ratio
+					Real angle = KI_Max!Real(to_light * s.Get_Normal(from), 0.0);
+					
+					// Accumulate colour
 					fin = fin + (angle * hit.shape.material.colour);
 				}
 				
+				// Ambient light
 				fin = fin + config.ambient.Multiply_Each(hit.shape.material.colour);
 				
-				bitmap.Set_Pixel(KI_Vec2I(cast(Integer) i, cast(Integer) j), fin.Clamp(0.0, 1.0));
+				// Set the pixel to its final colour
+				bitmap.Set_Pixel(KI_Vec2I(cast(Integer) j, cast(Integer) (config.res.y - i - 1)), fin.Clamp(0.0, 1.0));
 			}
 		}
 	}
