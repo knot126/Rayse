@@ -115,21 +115,29 @@ int main(int argc, const char *argv[]) {
 	}
 	
 	DgBitmapSetFlags(&bmp, DG_BITMAP_DRAWING_ALPHA | DG_BITMAP_DRAWING_PERSPECTIVE);
+	DgBitmapSetDepthBuffer(&bmp, true);
 	
 	// Initialise window
 	if (DgWindowInit(&win, "Software Rendering", (DgVec2I) {1280, 720})) {
 		return 1;
 	}
 	
+	double frame_time = 0.0;
+	
 	// Main loop
 	for (size_t i = 0;; i++) {
+		frame_time = DgTime();
+		
 		DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.0f, 0.0f, 1.0f});
 		
-		for (size_t j = 0; j < i; j++) {
-			DgBitmapDrawPoint(&bmp, (float)j / 100.0f, 0.93f, 0.01f, (DgColour4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), 1.0f});
-		}
+// 		for (size_t j = 0; j < i; j++) {
+// 			DgBitmapDrawPoint(&bmp, (float)j / 100.0f, 0.93f, 0.01f, (DgColour4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), 1.0f});
+// 		}
 		
-		KI_Triangle_Test(&bmp);
+		//KI_Triangle_Test(&bmp);
+		
+		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f}, (DgVec2){0.9f, 0.5f + (DgSin(0.1f * frame_time) * 0.4f)}, &(DgColour){0.7f, 0.3f, 0.8f, 1.0f});
+		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.1f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f}, &(DgColour){0.6f, 0.8f, 0.4f, 1.0f});
 		
 		uint32_t a = DgWindowUpdate(&win, &bmp);
 		
@@ -139,6 +147,10 @@ int main(int argc, const char *argv[]) {
 		else if (a > 0) {
 			break;
 		}
+		
+		frame_time = DgTime() - frame_time;
+		
+		DgLog(DG_LOG_INFO, "Frame time: %.5gms", frame_time * 1000.0);
 	}
 	
 	DgWindowFree(&win);
