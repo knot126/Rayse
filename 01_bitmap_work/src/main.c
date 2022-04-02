@@ -136,8 +136,9 @@ int main(int argc, const char *argv[]) {
 		
 		//KI_Triangle_Test(&bmp);
 		
-		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f}, (DgVec2){0.9f, 0.5f + (DgSin(0.1f * frame_time) * 0.4f)}, &(DgColour){0.7f, 0.3f, 0.8f, 1.0f});
-		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.1f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f}, &(DgColour){0.6f, 0.8f, 0.4f, 1.0f});
+		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.01f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.1f * frame_time) * 0.4f)}, &(DgColour){0.7f, 0.3f, 0.8f, 1.0f});
+		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.1f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.01f * frame_time) * 0.4f)}, &(DgColour){0.6f, 0.8f, 0.4f, 1.0f});
+		DgBitmapDrawLine(&bmp, (DgVec2){0.5f + (DgCos(0.08f * frame_time) * 0.4f), 0.1f}, (DgVec2){0.5f + (DgSin(0.08f * frame_time) * 0.4f), 0.9f}, &(DgColour){0.9f, 0.1f, 0.6f, 1.0f});
 		
 		uint32_t a = DgWindowUpdate(&win, &bmp);
 		
