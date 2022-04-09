@@ -25,42 +25,8 @@ void KI_Convex_Polygon_Test(DgBitmap *bmp) {
 	}
 }
 
-void KI_Triangle_Test(DgBitmap *bmp) {
+void KI_Triangle_Test(DgBitmap *bmp, float time) {
 	DgBitmapTriangle t[] = {
-		(DgBitmapTriangle) {
-			(DgBitmapVertex) {
-				(DgVec3) {-1.0f, 1.0f, 2.0f},
-				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {1.0f, 0.0f, 0.0f, 0.5f}
-			},
-			(DgBitmapVertex) {
-				(DgVec3) {-1.0f, -1.0f, 2.0f},
-				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {0.0f, 1.0f, 0.0f, 0.5f}
-			},
-			(DgBitmapVertex) {
-				(DgVec3) {1.0f, -1.0f, 2.0f},
-				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {0.0f, 0.0f, 1.0f, 0.5f}
-			}
-		},
-		(DgBitmapTriangle) {
-			(DgBitmapVertex) {
-				(DgVec3) {-1.0f, 1.0f, 2.0f},
-				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {1.0f, 0.0f, 0.0f, 0.5f}
-			},
-			(DgBitmapVertex) {
-				(DgVec3) {1.0f, 1.0f, 2.0f},
-				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {1.0f, 1.0f, 0.0f, 0.5f}
-			},
-			(DgBitmapVertex) {
-				(DgVec3) {1.0f, -1.0f, 2.0f},
-				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {0.0f, 0.0f, 1.0f, 0.5f}
-			}
-		},
 		(DgBitmapTriangle) {
 			(DgBitmapVertex) {
 				(DgVec3) {1.0f, 1.0f, 3.0f},
@@ -75,7 +41,7 @@ void KI_Triangle_Test(DgBitmap *bmp) {
 			(DgBitmapVertex) {
 				(DgVec3) {1.0f, -1.0f, 2.0f},
 				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {0.0f, 0.0f, 1.0f, 0.5f}
+				(DgColour) {0.0f, 0.0f, 0.5f + (0.5f * DgSin(time)), 0.5f}
 			}
 		},
 		(DgBitmapTriangle) {
@@ -92,7 +58,41 @@ void KI_Triangle_Test(DgBitmap *bmp) {
 			(DgBitmapVertex) {
 				(DgVec3) {1.0f, -1.0f, 2.0f},
 				(DgVec2) {0.0f, 0.0f},
-				(DgColour) {0.0f, 0.0f, 1.0f, 0.5f}
+				(DgColour) {0.0f, 0.0f, 0.5f + (0.5f * DgSin(time)), 0.5f}
+			}
+		},
+		(DgBitmapTriangle) {
+			(DgBitmapVertex) {
+				(DgVec3) {-1.0f, 1.0f, 2.0f},
+				(DgVec2) {0.0f, 0.0f},
+				(DgColour) {0.5f + (0.5f * DgCos(time)), 0.0f, 0.0f, 0.5f}
+			},
+			(DgBitmapVertex) {
+				(DgVec3) {-1.0f, -1.0f, 2.0f},
+				(DgVec2) {0.0f, 0.0f},
+				(DgColour) {0.0f, 1.0f, 0.0f, 0.5f}
+			},
+			(DgBitmapVertex) {
+				(DgVec3) {1.0f, -1.0f, 2.0f},
+				(DgVec2) {0.0f, 0.0f},
+				(DgColour) {0.0f, 0.0f, 0.5f + (0.5f * DgCos(time)), 0.5f}
+			}
+		},
+		(DgBitmapTriangle) {
+			(DgBitmapVertex) {
+				(DgVec3) {-1.0f, 1.0f, 2.0f},
+				(DgVec2) {0.0f, 0.0f},
+				(DgColour) {0.5f + (0.5f * DgCos(time)), 0.0f, 0.0f, 0.5f}
+			},
+			(DgBitmapVertex) {
+				(DgVec3) {1.0f, 1.0f, 2.0f},
+				(DgVec2) {0.0f, 0.0f},
+				(DgColour) {1.0f, 1.0f, 0.0f, 0.5f}
+			},
+			(DgBitmapVertex) {
+				(DgVec3) {1.0f, -1.0f, 2.0f},
+				(DgVec2) {0.0f, 0.0f},
+				(DgColour) {0.0f, 0.0f, 0.5f + (0.5f * DgCos(time)), 0.5f}
 			}
 		},
 	};
@@ -128,17 +128,15 @@ int main(int argc, const char *argv[]) {
 	for (size_t i = 0;; i++) {
 		frame_time = DgTime();
 		
-		DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.0f, 0.0f, 1.0f});
+		DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.1f, 0.1f, 1.0f});
 		
-// 		for (size_t j = 0; j < i; j++) {
-// 			DgBitmapDrawPoint(&bmp, (float)j / 100.0f, 0.93f, 0.01f, (DgColour4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), 1.0f});
-// 		}
+		KI_Triangle_Test(&bmp, frame_time);
 		
-		//KI_Triangle_Test(&bmp);
+		//DgBitmapDrawCurve1(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.01f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.1f * frame_time) * 0.4f)}, (DgVec2){0.0f, 0.0f}, &(DgColour){0.8f, 0.5f, 0.0f, 1.0f});
 		
-		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.01f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.1f * frame_time) * 0.4f)}, &(DgColour){0.7f, 0.3f, 0.8f, 1.0f});
-		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.1f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.01f * frame_time) * 0.4f)}, &(DgColour){0.6f, 0.8f, 0.4f, 1.0f});
-		DgBitmapDrawLine(&bmp, (DgVec2){0.5f + (DgCos(0.08f * frame_time) * 0.4f), 0.1f}, (DgVec2){0.5f + (DgSin(0.08f * frame_time) * 0.4f), 0.9f}, &(DgColour){0.9f, 0.1f, 0.6f, 1.0f});
+// 		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.01f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.1f * frame_time) * 0.4f)}, &(DgColour){0.7f, 0.3f, 0.8f, 1.0f});
+// 		DgBitmapDrawLine(&bmp, (DgVec2){0.1f, 0.5f + (DgCos(0.1f * frame_time) * 0.4f)}, (DgVec2){0.9f, 0.5f + (DgSin(0.01f * frame_time) * 0.4f)}, &(DgColour){0.6f, 0.8f, 0.4f, 1.0f});
+// 		DgBitmapDrawLine(&bmp, (DgVec2){0.5f + (DgCos(0.08f * frame_time) * 0.4f), 0.1f}, (DgVec2){0.5f + (DgSin(0.08f * frame_time) * 0.4f), 0.9f}, &(DgColour){0.9f, 0.1f, 0.6f, 1.0f});
 		
 		uint32_t a = DgWindowUpdate(&win, &bmp);
 		
@@ -151,7 +149,7 @@ int main(int argc, const char *argv[]) {
 		
 		frame_time = DgTime() - frame_time;
 		
-		DgLog(DG_LOG_INFO, "Frame time: %.5gms", frame_time * 1000.0);
+		DgLog(DG_LOG_INFO, "Frame time: %.5gms (%.3g fps)", frame_time * 1000.0, 1 / frame_time);
 	}
 	
 	DgWindowFree(&win);
