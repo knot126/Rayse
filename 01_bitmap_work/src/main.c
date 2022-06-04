@@ -107,7 +107,13 @@ typedef struct KI_Smash_Hit_Vertex {
 	char r, g, b, s;
 } KI_Smash_Hit_Vertex;
 
-void KI_Render_Smash_Hit_Segment(DgBitmap * restrict this, const char * restrict filename, float zoffset) {
+typedef struct KI_Smash_Hit_Mesh {
+	DgBitmapIndex *indexes;
+	DgBitmapVertex *vertexes;
+	uint32_t index_count;
+} KI_Smash_Hit_Mesh;
+
+int32_t KI_Smash_Hit_Mesh_Load(KI_Smash_Hit_Mesh * restrict mesh, const char * restrict filename, float zoffset) {
 	/**
 	 * Not meant for drawing per frame!!!
 	 */
@@ -118,7 +124,7 @@ void KI_Render_Smash_Hit_Segment(DgBitmap * restrict this, const char * restrict
 	DgFile f = DgFileOpen2(filename, DG_FILE_STREAM_READ);
 	
 	if (!f) {
-		return;
+		return -1;
 	}
 	
 	// Read vertex data
@@ -127,57 +133,64 @@ void KI_Render_Smash_Hit_Segment(DgBitmap * restrict this, const char * restrict
 	
 	if (!sh_vertexes) {
 		DgLog(DG_LOG_ERROR, "Failed to allocate memory!");
-		return;
+		return -1;
 	}
 	
 	DgFileStreamRead(f, sizeof *sh_vertexes * size, sh_vertexes);
 	
 	// Convert to proper format
-	DgBitmapVertex *vertexes = DgAlloc(sizeof *vertexes * size);
+	mesh->vertexes = DgAlloc(sizeof *mesh->vertexes * size);
 	
-	if (!vertexes) {
+	if (!mesh->vertexes) {
 		DgLog(DG_LOG_ERROR, "Failed to allocate memory!");
-		return;
+		return -1;
 	}
 	
 	for (size_t i = 0; i < size; i++) {
-		vertexes[i].position.x = sh_vertexes[i].x;
-		vertexes[i].position.y = sh_vertexes[i].y - 1.0f;
-		vertexes[i].position.z = sh_vertexes[i].z;
-		vertexes[i].texture.u = sh_vertexes[i].u;
-		vertexes[i].texture.v = sh_vertexes[i].v;
+		mesh->vertexes[i].position.x = sh_vertexes[i].x;
+		mesh->vertexes[i].position.y = sh_vertexes[i].y - 1.0f;
+		mesh->vertexes[i].position.z = sh_vertexes[i].z;
+		mesh->vertexes[i].texture.u = sh_vertexes[i].u;
+		mesh->vertexes[i].texture.v = sh_vertexes[i].v;
 		float shade = ((float)sh_vertexes[i].s) / 255.0f;
 		shade *= shade;
 		shade = 1.0f - shade;
-		vertexes[i].colour.r = ((float)sh_vertexes[i].r * 2.0f) / 255.0f * shade;
-		vertexes[i].colour.g = ((float)sh_vertexes[i].g * 2.0f) / 255.0f * shade;
-		vertexes[i].colour.b = ((float)sh_vertexes[i].b * 2.0f) / 255.0f * shade;
+		mesh->vertexes[i].colour.r = ((float)sh_vertexes[i].r * 2.0f) / 255.0f * shade;
+		mesh->vertexes[i].colour.g = ((float)sh_vertexes[i].g * 2.0f) / 255.0f * shade;
+		mesh->vertexes[i].colour.b = ((float)sh_vertexes[i].b * 2.0f) / 255.0f * shade;
 		//vertexes[i].colour.r = DgRandFloat(); vertexes[i].colour.g = DgRandFloat(); vertexes[i].colour.b = DgRandFloat();
-		vertexes[i].colour.a = 1.0f;
+		mesh->vertexes[i].colour.a = 1.0f;
 	}
 	
 	DgFree(sh_vertexes);
 	
 	// Read index data
 	DgFileStreamReadUInt32(f, &size);
-	DgBitmapIndex *indexes = DgAlloc(sizeof *indexes * size);
+	mesh->index_count = size;
+	mesh->indexes = DgAlloc(sizeof *mesh->indexes * size);
 	
-	if (indexes == NULL) {
+	if (mesh->indexes == NULL) {
 		DgLog(DG_LOG_ERROR, "Failed to allocate memory!");
-		return;
+		return -1;
 	}
 	
-	DgFileStreamRead(f, sizeof *indexes * size, indexes);
+	DgFileStreamRead(f, sizeof *mesh->indexes * size, mesh->indexes);
 	
 	// Close file
 	DgFileStreamClose(f);
 	
+	return 0;
+}
+
+void KI_Smash_Hit_Mesh_Render(KI_Smash_Hit_Mesh * restrict mesh, DgBitmap * restrict bitmap) {
 	// Draw to bitmap
-	DgBitmapDrawTrianglesIndexed(this, size, indexes, vertexes);
-	
-	// Free file stream
-	DgFree(vertexes);
-	DgFree(indexes);
+	DgBitmapDrawTrianglesIndexed(bitmap, mesh->index_count, mesh->indexes, mesh->vertexes);
+}
+
+void KI_Smash_Hit_Mesh_Free(KI_Smash_Hit_Mesh * restrict this) {
+	// Free data
+	DgFree(this->vertexes);
+	DgFree(this->indexes);
 }
 
 int main(int argc, const char *argv[]) {
@@ -202,7 +215,16 @@ int main(int argc, const char *argv[]) {
 		return 1;
 	}
 	
+	// Load segment
+// 	KI_Smash_Hit_Mesh mesh;
+// 	
+// 	if (KI_Smash_Hit_Mesh_Load(&mesh, "data.mesh", 0.0f)) {
+// 		return 1;
+// 	}
+	
 	double frame_time = 0.0;
+	
+	DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.0f, 0.0f, 1.0f});
 	
 	// Main loop
 	for (size_t i = 0;; i++) {
@@ -210,7 +232,18 @@ int main(int argc, const char *argv[]) {
 		
 		DgBitmapFill(&bmp, (DgVec4) {0.0f, 0.1f, 0.1f, 1.0f});
 		
-		KI_Render_Smash_Hit_Segment(&bmp, "data.mesh", frame_time * 0.01f);
+		DgVec2 cursor = DgWindowGetMouseLocation(&win);
+		
+		//DgBitmapDrawPoint(&bmp, cursor.x, cursor.y, 0.1f, (DgVec4) {DgRandFloat(), DgRandFloat(), DgRandFloat(), DgRandFloat()});
+		
+		DgBitmapDrawQuadraticBezier(&bmp, (DgVec2) {0.3f, 0.7f}, cursor, (DgVec2) {0.7f, 0.3f}, &(DgVec4) {1.0f, 1.0f, 1.0f, 1.0f});
+		
+		DgBitmapDrawPoint(&bmp, 0.3f, 0.7f, 0.01f, (DgVec4) {1.0f, 1.0f, 1.0f, 0.5f});
+		DgBitmapDrawPoint(&bmp, cursor.x, cursor.y, 0.01f, (DgVec4) {1.0f, 1.0f, 1.0f, 0.5f});
+		DgBitmapDrawPoint(&bmp, 0.7f, 0.3f, 0.01f, (DgVec4) {1.0f, 1.0f, 1.0f, 0.5f});
+		
+		DgBitmapDrawLine(&bmp, (DgVec2) {0.3f, 0.7f}, cursor, &(DgVec4) {1.0f, 1.0f, 1.0f, 0.4f});
+		DgBitmapDrawLine(&bmp, cursor, (DgVec2) {0.7f, 0.3f}, &(DgVec4) {1.0f, 1.0f, 1.0f, 0.4f});
 		
 		uint32_t a = DgWindowUpdate(&win, &bmp);
 		
@@ -225,6 +258,8 @@ int main(int argc, const char *argv[]) {
 		
 		DgLog(DG_LOG_INFO, "Frame time: %.5gms (%.3g fps)", frame_time * 1000.0, 1 / frame_time);
 	}
+	
+// 	KI_Smash_Hit_Mesh_Free(&mesh);
 	
 	DgWindowFree(&win);
 	DgBitmapFree(&bmp);
