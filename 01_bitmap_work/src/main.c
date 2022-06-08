@@ -197,7 +197,7 @@ int main(int argc, const char *argv[]) {
 	DgLog(DG_LOG_INFO, "Hello, world!\n");
 	
 	DgInitTime();
-	DgInitPaths(DG_PATH_FAIL_FATAL);
+	DgInitPaths2("./assets");
 	
 	DgBitmap bmp;
 	DgWindow win;
